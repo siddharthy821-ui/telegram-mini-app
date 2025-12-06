@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+    h2 {
+      margin-top: 0;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 12px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>🎵 Song Search</h2>
+<input id="search" type="text" placeholder="Search song..." />
+<button onclick="sendSearch()">Search</button>
+
+<script>
+  const tg = window.Telegram.WebApp;
+  tg.expand();
+
+  function sendSearch() {
+    const query = document.getElementById('search').value;
+    if (!query) return;
+    tg.sendData(JSON.stringify({ type: "search", query }));
+  }
+
+  tg.MainButton.setText("Close").onClick(() => tg.close());
+  tg.Main
