@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Music Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 16px;
+    }
+    .song {
+      border-bottom: 1px solid #ccc;
+      padding: 8px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>🎵 Song Search</h2>
+
+  <input type="text" id="query" placeholder="Search song..." />
+  <button onclick="searchSong()">Search</button>
+
+  <div id="results"></div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+async function searchSong() {
+  const q = document.getElementById("query").value;
+  if (!q) return;
+
+  const res = await fetch(
+    `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=10`
+  );
+
+  const data = await res.json();
+  const box = document.getElementById("results");
+  box.innerHTML = "";
+
+  data.results.forEach(song => {
+    box.innerHTML += `
+      <div class="song">
+        <b>${song.trackName}</b><br>
+        ${song.artistName}<br>
+        <audio controls src="${song.previewUrl}"></audio>
+      </div>
+    `;
+  });
+}
+</script>
+</body>
+  </html>
