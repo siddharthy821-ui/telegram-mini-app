@@ -1,61 +1,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Music Mini App</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      font-size: 16px;
-    }
-    .song {
-      border-bottom: 1px solid #ccc;
-      padding: 8px 0;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Music Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --text:#e5e7eb;
+  --sub:#9ca3af;
+  --accent:#22c55e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.header{
+  padding:14px;
+  font-size:18px;
+  font-weight:bold;
+}
+.search-box{
+  padding:10px;
+}
+.search-box input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  font-size:16px;
+}
+.list{
+  padding:10px;
+}
+.card{
+  display:flex;
+  align-items:center;
+  background:var(--card);
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:10px;
+}
+.card img{
+  width:60px;
+  height:60px;
+  border-radius:8px;
+  object-fit:cover;
+  margin-right:10px;
+}
+.info{
+  flex:1;
+}
+.info b{
+  display:block;
+  font-size:14px;
+}
+.info span{
+  font-size:12px;
+  color:var(--sub);
+}
+.play-btn{
+  background:var(--accent);
+  color:#000;
+  border:none;
+  border-radius:50%;
+  width:44px;
+  height:44px;
+  font-size:16px;
+}
+.player{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#020617;
+  padding:8px;
+  display:none;
+}
+.player audio{
+  width:100%;
+}
+</style>
 </head>
 
 <body>
-  <h2>🎵 Song Search</h2>
 
-  <input type="text" id="query" placeholder="Search song..." />
-  <button onclick="searchSong()">Search</button>
+<div class="header">🎵 Music</div>
 
-  <div id="results"></div>
+<div class="search-box">
+  <input id="query" placeholder="Search songs, artists..." onkeyup="if(event.key=='Enter')searchSong()">
+</div>
+
+<div class="list" id="results"></div>
+
+<div class="player" id="player">
+  <audio id="audio" controls></audio>
+</div>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-async function searchSong() {
-  const q = document.getElementById("query").value;
-  if (!q) return;
+async function searchSong(){
+  const q=document.getElementById("query").value.trim();
+  if(!q) return;
 
-  const res = await fetch(
-    `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=10`
+  const res=await fetch(
+    `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=20`
   );
+  const data=await res.json();
+  const box=document.getElementById("results");
+  box.innerHTML="";
 
-  const data = await res.json();
-  const box = document.getElementById("results");
-  box.innerHTML = "";
-
-  data.results.forEach(song => {
-    box.innerHTML += `
-      <div class="song">
-        <b>${song.trackName}</b><br>
-        ${song.artistName}<br>
-        <audio controls src="${song.previewUrl}"></audio>
+  data.results.forEach(s=>{
+    box.innerHTML+=`
+      <div class="card">
+        <img src="${s.artworkUrl100}">
+        <div class="info">
+          <b>${s.trackName}</b>
+          <span>${s.artistName}</span>
+        </div>
+        <button class="play-btn" onclick="playSong('${s.previewUrl}')">▶</button>
       </div>
     `;
   });
 }
+
+function playSong(url){
+  const p=document.getElementById("player");
+  const a=document.getElementById("audio");
+  a.src=url;
+  p.style.display="block";
+  a.play();
+}
 </script>
+
 </body>
-  </html>
+</html>
